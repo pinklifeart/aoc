@@ -11,10 +11,7 @@ defmodule Day2 do
     |> Enum.sum()
   end
 
-  def handle_list(list = [head | tail]) do
-    IO.puts("---")
-    IO.inspect(list, charlists: :as_lists)
-    # IO.inspect(tail, charlists: :as_lists)
+  def handle_list([head | tail]) do
     diff = head - List.first(tail)
 
     case diff do
@@ -26,7 +23,6 @@ defmodule Day2 do
 
   def handle_list([head | tail], last_diff) do
     if Enum.count(tail) == 0 do
-      IO.puts("PASS")
       1
     else
       diff = head - List.first(tail)
@@ -38,12 +34,9 @@ defmodule Day2 do
             handle_list(tail, diff)
 
           _ ->
-            IO.puts(diff)
-            IO.puts("case fail")
             0
         end
       else
-        IO.puts("direction fail")
         0
       end
     end
@@ -61,7 +54,7 @@ defmodule Day2 do
     |> IO.puts()
   end
 
-  def handle_list_dampened(list = [head | tail], dampener_count \\ 0) do
+  def handle_list_dampened([head | tail], dampener_count \\ 0) do
     diff = head - List.first(tail)
 
     case diff do
