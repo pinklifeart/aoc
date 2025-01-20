@@ -6,6 +6,10 @@ defmodule Day4Test do
     assert Day4.part1("test/sample_d4.txt") == 18
   end
 
+  test "sample data part 2" do
+    assert Day4.part2("test/sample_d4.txt") == 9
+  end
+
   test "pad with nil to double length and shift right" do
     assert Day4.pad_and_shift_right(~c"abc", 1) == [nil, ?a, ?b, ?c, nil, nil]
   end
@@ -20,5 +24,9 @@ defmodule Day4Test do
 
   test "rotate 45 degrees" do
     assert Day4.rotate_45deg([["a", "b"], ["c", "d"]]) == [["a"], ["b", "c"], ["d"]]
+  end
+
+  test "rotate -45 degrees" do
+    assert Day4.revert_45deg_rotation([["a"], ["b", "c"], ["d"]]) == [["a", "b"], ["c", "d"]]
   end
 end

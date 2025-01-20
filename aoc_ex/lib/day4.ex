@@ -31,7 +31,7 @@ defmodule Day4 do
   end
 
   def preprocess_data(input) do
-    Enum.map(input, fn line -> String.to_charlist(line) end)
+    Enum.map(input, fn line -> String.trim(line) |> String.to_charlist() end)
   end
 
   def process_data(input) do
@@ -86,5 +86,72 @@ defmodule Day4 do
 
     [[List.duplicate(nil, shift) | chars] | List.duplicate(nil, len - shift)]
     |> List.flatten()
+  end
+
+  def part2(filename \\ "day4.txt") do
+    content = File.stream!(filename)
+
+    part1 =
+      content
+      |> Day4.numerify()
+
+    part2 =
+      content
+      |> Enum.reverse()
+      |> Day4.numerify()
+      |> Enum.reverse()
+
+    Enum.zip_with(part1, part2, fn part1_inner, part2_inner ->
+      Enum.zip_with(part1_inner, part2_inner, fn x, y -> x + y end)
+    end)
+    |> List.flatten()
+    |> Enum.filter(fn x -> x == 6 end)
+    |> Enum.count()
+  end
+
+  def numerify(list) do
+    list
+    |> Day4.preprocess_data()
+    |> Day4.rotate_45deg()
+    |> Enum.map(fn line -> Kernel.to_string(line) end)
+    |> Enum.map(fn line -> Regex.replace(~r/MAS/, line, "132") end)
+    |> Enum.map(fn line -> Regex.replace(~r/(2|S)A(1|M)/, line, "231") end)
+    |> Day4.preprocess_data()
+    |> Day4.revert_45deg_rotation()
+    |> Enum.map(&Kernel.to_string(&1))
+    |> Enum.map(&Regex.replace(~r/(X|M|A|S)/, &1, "0"))
+    |> Enum.map(&String.codepoints/1)
+    |> Enum.map(&Enum.map(&1, fn int -> String.to_integer(int) end))
+  end
+
+  def revert_45deg_rotation(list) do
+    len =
+      Enum.map(list, fn inner -> Enum.count(inner) end)
+      |> Enum.max()
+
+    acc = List.duplicate(nil, len)
+
+    revert_45deg_rotation(list, len, acc)
+  end
+
+  def revert_45deg_rotation(list, len, acc, counter \\ 0) do
+    case list do
+      [] ->
+        acc
+
+      _ ->
+        {head, tail} = Enum.split(list, len)
+
+        {first_elements, head_popped} =
+          Enum.map(head, fn line ->
+            List.pop_at(line, 0)
+          end)
+          |> Enum.unzip()
+
+        acc = List.replace_at(acc, counter, first_elements)
+
+        head_cleaned = Enum.reject(head_popped, &(&1 == []))
+        revert_45deg_rotation(head_cleaned ++ tail, len, acc, counter + 1)
+    end
   end
 end
